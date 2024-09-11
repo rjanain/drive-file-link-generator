@@ -33,8 +33,8 @@ This library processes student answer scripts stored in a Google Drive folder, u
 
 1. Clone this repository and navigate to the project directory:
    ```bash
-   git clone https://github.com/your-repo/student-answer-library.git
-   cd student-answer-library
+   git clone https://github.com/rjanain/drive-file-link-generator.git
+   cd drive-file-link-generator
    ```
 
 2. Install necessary packages for development

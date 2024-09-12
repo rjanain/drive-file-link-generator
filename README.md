@@ -77,7 +77,7 @@ Modify the `src/config.js` file to include:
 
 ## Usage
 
-Once the code is deployed in Google Apps Script, call the `initializeProcess` function to start processing the student answer scripts and log the results to Google Sheets.
+Once the code is deployed in Google Apps Script, call the `initializeProcess` function to start processing the student answer scripts and log the results to Google Sheets. 
 
 ## Development
 

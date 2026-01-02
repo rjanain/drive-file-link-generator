@@ -10,7 +10,13 @@ function initializeProcess() {
   const existingFolders = getExistingFolders(spreadsheet);
   const newFolders = listSubFolders(config.parentFolderId, existingFolders);
   appendNewFolders(spreadsheet, newFolders);
-  const unprocessedFolders = filterUnprocessedFolders(existingFolders);
+  
+  // Ensure data is written before re-reading
+  SpreadsheetApp.flush();
+  
+  // Re-fetch folders to include the newly added ones for processing
+  const allFolders = getExistingFolders(spreadsheet);
+  const unprocessedFolders = filterUnprocessedFolders(allFolders);
   processFolders(unprocessedFolders, spreadsheet);
   Logger.log("Initialization process completed.");
 }

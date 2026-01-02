@@ -11,6 +11,11 @@ function ensureSheet(spreadsheet, sheetName, headers) {
     if (!sheet) {
         sheet = spreadsheet.insertSheet(sheetName);
         sheet.appendRow(headers);
+    } else {
+        if (sheet.getLastRow() === 0) {
+            Logger.log(`Sheet ${sheetName} is empty. Appending headers.`);
+            sheet.appendRow(headers);
+        }
     }
 }
 

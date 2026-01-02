@@ -2,6 +2,7 @@
  * Initializes the listing and processing of folders and files.
  */
 function initializeProcess() {
+  Logger.log("Starting initialization process...");
   const spreadsheet = SpreadsheetApp.openById(config.storageSheetId);
   ensureSheet(spreadsheet, config.sheetNames.dataTrack, config.headers.dataTrack);
   ensureSheet(spreadsheet, config.sheetNames.links, config.headers.links);
@@ -11,4 +12,5 @@ function initializeProcess() {
   appendNewFolders(spreadsheet, newFolders);
   const unprocessedFolders = filterUnprocessedFolders(existingFolders);
   processFolders(unprocessedFolders, spreadsheet);
+  Logger.log("Initialization process completed.");
 }

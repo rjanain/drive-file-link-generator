@@ -4,6 +4,7 @@
  * @return {Array} An array of file data.
  */
 function listFilesInFolder(folderId) {
+    Logger.log(`Listing files in folder: ${folderId}`);
     const folder = DriveApp.getFolderById(folderId);
     const files = folder.getFiles();
     const fileList = [];
@@ -31,6 +32,7 @@ function listFilesInFolder(folderId) {
  * @return {Array} An array of folder objects with names and IDs.
  */
 function listSubFolders(folderId, existingFolders) {
+    Logger.log(`Listing subfolders for parent folder: ${folderId}`);
     const parentFolder = DriveApp.getFolderById(folderId);
     const childFolders = parentFolder.getFolders();
     const newFolders = [];

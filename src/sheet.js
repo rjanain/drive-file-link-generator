@@ -22,8 +22,8 @@ function getExistingFolders(spreadsheet) {
     const sheet = spreadsheet.getSheetByName(config.sheetNames.dataTrack);
     const data = sheet.getDataRange().getValues();
     let folders = {};
-    data.slice(1).forEach(row => {
-        folders[row[1]] = { name: row[0], processed: row[2], date: row[3], note: row[4] };
+    data.slice(1).forEach((row, index) => {
+        folders[row[1]] = { name: row[0], processed: row[2], date: row[3], note: row[4], rowIndex: index + 2 };
     });
     return folders;
 }
@@ -43,19 +43,24 @@ function appendNewFolders(spreadsheet, newFolders) {
     }
 }
 
+
 /**
- * Finds the row index of a folder by ID.
- * @param {GoogleAppsScript.Spreadsheet.Sheet} sheet - Sheet object.
- * @param {string} folderId - ID of the folder to find.
- * @return {number} The row index.
+ * Logs the file information to a Google Sheet.
+ * @param {Array} files - Array of file data.
+ * @param {string} folderName - Name of the folder being processed.
+ * @return {number} Number of files processed.
  */
-function findRowById(sheet, folderId) {
-    const data = sheet.getDataRange().getValues();
-    for (let i = 1; i < data.length; i++) {
-        if (data[i][1] === folderId) {
-            return i + 1; // Account for array indexing vs Sheets indexing
-        }
+function logFilesToSheet(files, folderName) {
+    const sheet = SpreadsheetApp.openById(config.storageSheetId).getSheetByName(config.sheetNames.links);
+    const lastRow = sheet.getLastRow();
+    const values = files.map(file => {
+        // Remove file extension from filename
+        const fileNameWithoutExtension = file.name.replace(/\.[^/.]+$/, "");
+        return [folderName, fileNameWithoutExtension, file.url, file.owner, file.generatedOn];
+    });
+    if (values.length > 0) {
+        sheet.getRange(lastRow + 1, 1, values.length, values[0].length).setValues(values);
     }
-    return null;
+    return files.length;
 }
 

@@ -8,7 +8,8 @@ const config = {
     headers: {
       dataTrack: ["Folder Name", "Folder ID", "Processed", "Processed Date", "Processed Note"],
       links: ["Folder Name", "File Name", "File URL", "File Owner", "Link Generated On"]
-    }
+    },
+    updatePermissions: false // Set to true to enable "Anyone with the link can view" permission
   };
   
   

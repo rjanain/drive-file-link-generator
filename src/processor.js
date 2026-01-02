@@ -7,7 +7,7 @@
 function filterUnprocessedFolders(existingFolders) {
     return Object.keys(existingFolders)
         .filter(key => !existingFolders[key].processed)
-        .map(key => ({ id: key, name: existingFolders[key].name }));
+        .map(key => ({ id: key, name: existingFolders[key].name, rowIndex: existingFolders[key].rowIndex }));
 }
 
 /**
@@ -19,17 +19,25 @@ function processFolders(folders, spreadsheet) {
     const dataTrackSheet = spreadsheet.getSheetByName(config.sheetNames.dataTrack);
 
     folders.forEach(folder => {
-        Logger.log(`Processing folder: ${folder.name}`);
-        const filesList = listFilesInFolder(folder.id);
-        const processedCount = updatePermissionsAndLog(filesList, folder.name);
-        Logger.log(`Completed processing folder: ${folder.name} with ${processedCount} files processed.`);
+        try {
+            Logger.log(`Processing folder: ${folder.name}`);
+            const filesList = listFilesInFolder(folder.id);
+            const processedCount = logFilesToSheet(filesList, folder.name);
+            Logger.log(`Completed processing folder: ${folder.name} with ${processedCount} files processed.`);
 
-        // Update the dataTrack sheet
-        const rowIndex = findRowById(dataTrackSheet, folder.id);
-        if (rowIndex) {
-            dataTrackSheet.getRange(rowIndex, 3).setValue(true);
-            dataTrackSheet.getRange(rowIndex, 4).setValue(new Date());
-            dataTrackSheet.getRange(rowIndex, 5).setValue(`${processedCount} files processed`);
+            // Update the dataTrack sheet
+            const rowIndex = folder.rowIndex;
+            if (rowIndex) {
+                dataTrackSheet.getRange(rowIndex, 3).setValue(true);
+                dataTrackSheet.getRange(rowIndex, 4).setValue(new Date());
+                dataTrackSheet.getRange(rowIndex, 5).setValue(`${processedCount} files processed`);
+            }
+        } catch (e) {
+            Logger.log(`Error processing folder ${folder.name}: ${e.message}`);
+            const rowIndex = folder.rowIndex;
+            if (rowIndex) {
+                dataTrackSheet.getRange(rowIndex, 5).setValue(`Error: ${e.message}`);
+            }
         }
     });
 }

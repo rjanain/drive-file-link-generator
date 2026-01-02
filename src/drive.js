@@ -10,7 +10,9 @@ function listFilesInFolder(folderId) {
 
     while (files.hasNext()) {
         const file = files.next();
-        file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+        if (config.updatePermissions) {
+            file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+        }
         fileList.push({
             name: file.getName(),
             url: file.getUrl(),
@@ -40,25 +42,4 @@ function listSubFolders(folderId, existingFolders) {
         }
     }
     return newFolders;
-}
-
-
-/**
- * Logs the file information to a Google Sheet and updates the permissions.
- * @param {Array} files - Array of file data.
- * @param {string} folderName - Name of the folder being processed.
- * @return {number} Number of files processed.
- */
-function updatePermissionsAndLog(files, folderName) {
-    const sheet = SpreadsheetApp.openById(config.storageSheetId).getSheetByName(config.sheetNames.links);
-    const lastRow = sheet.getLastRow();
-    const values = files.map(file => {
-        // Remove file extension from filename
-        const fileNameWithoutExtension = file.name.replace(/\.[^/.]+$/, "");
-        return [folderName, fileNameWithoutExtension, file.url, file.owner, file.generatedOn];
-    });
-    if (values.length > 0) {
-        sheet.getRange(lastRow + 1, 1, values.length, values[0].length).setValues(values);
-    }
-    return files.length;
 }

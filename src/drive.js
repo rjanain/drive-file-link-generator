@@ -54,32 +54,60 @@ function listSubFolders(folderId, existingFolders) {
  */
 function renameFilesBasedOnRules(folderId, rules, spreadsheet) {
     Logger.log(`Starting renaming process in folder: ${folderId}`);
+    
+    let stats = {
+        filesCount: 0,
+        renameCount: 0
+    };
+
     try {
-        const folder = DriveApp.getFolderById(folderId);
+        const rootFolder = DriveApp.getFolderById(folderId);
+        processFolderRecursively(rootFolder, rules, spreadsheet, stats);
+        
+        Logger.log(`Finished processing folder tree. Total files scanned: ${stats.filesCount}. Total files renamed: ${stats.renameCount}.`);
+
+    } catch (e) {
+        Logger.log(`Error accessing root folder ${folderId}: ${e.message}`);
+    }
+}
+
+/**
+ * Recursive helper function to process a folder and its subfolders.
+ * @param {GoogleAppsScript.Drive.Folder} folder - The folder to process.
+ * @param {Array} rules - Renaming rules.
+ * @param {GoogleAppsScript.Spreadsheet.Spreadsheet} spreadsheet - Spreadsheet for logging.
+ * @param {Object} stats - Statistics object {filesCount, renameCount}.
+ */
+function processFolderRecursively(folder, rules, spreadsheet, stats) {
+    try {
+        // Process files in the current folder
         const files = folder.getFiles();
         
         while (files.hasNext()) {
             const file = files.next();
+            stats.filesCount++;
             const currentName = file.getName();
             
+            // Filter by file type if configured
+            if (config.targetFileType && !currentName.toLowerCase().endsWith(`.${config.targetFileType.toLowerCase()}`)) {
+                continue;
+            }
+            
             for (const rule of rules) {
-                // Check if the search ID is present in the filename
                 if (currentName.includes(rule.searchId)) {
                     
-                    // Construct new name, attempting to preserve extension
                     const extensionMatch = currentName.match(/\.[^/.]+$/);
                     const extension = extensionMatch ? extensionMatch[0] : "";
                     
                     const newNameBase = rule.newName;
-                    // Only append extension if newName doesn't end with it (simple check)
                     const finalNewName = newNameBase.endsWith(extension) ? newNameBase : newNameBase + extension;
                     
                     if (currentName !== finalNewName) {
                         try {
                             file.setName(finalNewName);
-                            // Call logRenamingResult from sheet.js
                             logRenamingResult(spreadsheet, currentName, finalNewName, file.getId(), "Success");
                             Logger.log(`Renamed: ${currentName} -> ${finalNewName}`);
+                            stats.renameCount++;
                         } catch (e) {
                             logRenamingResult(spreadsheet, currentName, finalNewName, file.getId(), "Error: " + e.message);
                             Logger.log(`Error renaming ${currentName}: ${e.message}`);
@@ -87,13 +115,20 @@ function renameFilesBasedOnRules(folderId, rules, spreadsheet) {
                     } else {
                         Logger.log(`Skipping ${currentName} (Already matches new name)`);
                     }
-                    
-                    // Stop checking other rules for this file once a match is found
                     break; 
                 }
             }
         }
+
+        // Recursively process subfolders
+        const subfolders = folder.getFolders();
+        while (subfolders.hasNext()) {
+            const subfolder = subfolders.next();
+            processFolderRecursively(subfolder, rules, spreadsheet, stats);
+        }
+
     } catch (e) {
-        Logger.log(`Error accessing folder ${folderId}: ${e.message}`);
+        Logger.log(`Error accessing folder ${folder.getName()}: ${e.message}`);
     }
 }
+

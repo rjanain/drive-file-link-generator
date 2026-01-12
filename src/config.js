@@ -12,28 +12,29 @@ const RENAMING_LOG_SHEET_NAME = "RenamingLog";
  * Configuration object for the script.
  */
 const config = {
-      parentFolderId: PARENT_FOLDER_ID,
-    storageSheetId: STORAGE_SHEET_ID,
-    renamingFolderId: RENAMING_FOLDER_ID,
-    sheetNames: {
-      dataTrack: DATA_TRACK_SHEET_NAME,
-      links: LINKS_SHEET_NAME,
-      renamingRules: RENAMING_RULES_SHEET_NAME,
-      renamingLog: RENAMING_LOG_SHEET_NAME
-    },
-    headers: {
-      dataTrack: ["Folder Name", "Folder ID", "Processed", "Processed Date", "Processed Note"],
-      links: ["Folder Name", "File Name", "File URL", "File Owner", "Link Generated On"],
-      renamingRules: ["Search ID", "New File Name"],
-      renamingLog: ["Original Name", "New Name", "File ID", "Status", "Date"]
-    },
-    updatePermissions: false // Set to true to enable "Anyone with the link can view" permission
-  };
-  
-    function startDriveFileListingProcess() {
-    initializeFileListingProcess()
-  }
+  parentFolderId: PARENT_FOLDER_ID,
+  storageSheetId: STORAGE_SHEET_ID,
+  renamingFolderId: RENAMING_FOLDER_ID,
+  targetFileType: "", // "csv", "pdf", "xlsx", or "" for all
+  sheetNames: {
+    dataTrack: DATA_TRACK_SHEET_NAME,
+    links: LINKS_SHEET_NAME,
+    renamingRules: RENAMING_RULES_SHEET_NAME,
+    renamingLog: RENAMING_LOG_SHEET_NAME
+  },
+  headers: {
+    dataTrack: ["Folder Name", "Folder ID", "Processed", "Processed Date", "Processed Note"],
+    links: ["Folder Name", "File Name", "File URL", "File Owner", "Link Generated On"],
+    renamingRules: ["Search ID", "New File Name"],
+    renamingLog: ["Original Name", "New Name", "File ID", "Status", "Date"]
+  },
+  updatePermissions: false // Set to true to enable "Anyone with the link can view" permission
+};
 
-  function startDriveFileRenamingProcess() {
-    initializeFileRenamingProcess()
-  }
+function startDriveFileListingProcess() {
+  initializeFileListingProcess()
+}
+
+function startDriveFileRenamingProcess() {
+  initializeFileRenamingProcess()
+}

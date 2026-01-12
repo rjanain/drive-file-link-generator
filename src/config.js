@@ -38,3 +38,7 @@ function startDriveFileListingProcess() {
 function startDriveFileRenamingProcess() {
   initializeFileRenamingProcess()
 }
+
+function startDriveFileRevertProcess() {
+  revertLastRenamingBatch()
+}

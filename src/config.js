@@ -1,21 +1,39 @@
+const PARENT_FOLDER_ID = "PARENT_FOLDER_ID"; // Replace Your Google Drive ID
+const RENAMING_FOLDER_ID = "RENAME_FOLDER_ID"; // Replace Your Google Drive ID (For Renaming)
+const STORAGE_SHEET_ID = "STORAGE_SHEET_ID"; // Replace Your Google Sheet ID
+
+/* Sheet Names */
+const DATA_TRACK_SHEET_NAME = "DriveFile";
+const LINKS_SHEET_NAME = "AnswerScriptLink";
+const RENAMING_RULES_SHEET_NAME = "RenamingRules";
+const RENAMING_LOG_SHEET_NAME = "RenamingLog";
+
+/**
+ * Configuration object for the script.
+ */
 const config = {
-    parentFolderId: "1qjhoFSfZ82YINe-TOEq8EXDLHRYwv3sY", // Replace Your Google Drive ID
-    storageSheetId: "1R6qJdluzar_SwbQfGkKRoQDzv3uxWa9DqLAuxQwujgQ", // Replace Your Google Sheet ID
+      parentFolderId: PARENT_FOLDER_ID,
+    storageSheetId: STORAGE_SHEET_ID,
+    renamingFolderId: RENAMING_FOLDER_ID,
     sheetNames: {
-      dataTrack: "DriveFile",
-      links: "AnswerScriptLink"
+      dataTrack: DATA_TRACK_SHEET_NAME,
+      links: LINKS_SHEET_NAME,
+      renamingRules: RENAMING_RULES_SHEET_NAME,
+      renamingLog: RENAMING_LOG_SHEET_NAME
     },
     headers: {
       dataTrack: ["Folder Name", "Folder ID", "Processed", "Processed Date", "Processed Note"],
-      links: ["Folder Name", "File Name", "File URL", "File Owner", "Link Generated On"]
+      links: ["Folder Name", "File Name", "File URL", "File Owner", "Link Generated On"],
+      renamingRules: ["Search ID", "New File Name"],
+      renamingLog: ["Original Name", "New Name", "File ID", "Status", "Date"]
     },
     updatePermissions: false // Set to true to enable "Anyone with the link can view" permission
   };
   
-  
-  /*
-  * Some Test
-  * Remove the extension of a filename that appears after a period (.).
-  * Remove any string that appears before and including an underscore (_).
-  * =REGEXREPLACE(A1, "(.*_)?(.+?)(\..*)?", "$2")
-  */
+    function startDriveFileListingProcess() {
+    initializeFileListingProcess()
+  }
+
+  function startDriveFileRenamingProcess() {
+    initializeFileRenamingProcess()
+  }

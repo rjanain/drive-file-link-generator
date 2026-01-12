@@ -45,3 +45,55 @@ function listSubFolders(folderId, existingFolders) {
     }
     return newFolders;
 }
+
+/**
+ * Renames files in a folder based on rules.
+ * @param {string} folderId - ID of the folder to process.
+ * @param {Array} rules - Array of renaming rules {searchId, newName}.
+ * @param {GoogleAppsScript.Spreadsheet.Spreadsheet} spreadsheet - Spreadsheet for logging.
+ */
+function renameFilesBasedOnRules(folderId, rules, spreadsheet) {
+    Logger.log(`Starting renaming process in folder: ${folderId}`);
+    try {
+        const folder = DriveApp.getFolderById(folderId);
+        const files = folder.getFiles();
+        
+        while (files.hasNext()) {
+            const file = files.next();
+            const currentName = file.getName();
+            
+            for (const rule of rules) {
+                // Check if the search ID is present in the filename
+                if (currentName.includes(rule.searchId)) {
+                    
+                    // Construct new name, attempting to preserve extension
+                    const extensionMatch = currentName.match(/\.[^/.]+$/);
+                    const extension = extensionMatch ? extensionMatch[0] : "";
+                    
+                    const newNameBase = rule.newName;
+                    // Only append extension if newName doesn't end with it (simple check)
+                    const finalNewName = newNameBase.endsWith(extension) ? newNameBase : newNameBase + extension;
+                    
+                    if (currentName !== finalNewName) {
+                        try {
+                            file.setName(finalNewName);
+                            // Call logRenamingResult from sheet.js
+                            logRenamingResult(spreadsheet, currentName, finalNewName, file.getId(), "Success");
+                            Logger.log(`Renamed: ${currentName} -> ${finalNewName}`);
+                        } catch (e) {
+                            logRenamingResult(spreadsheet, currentName, finalNewName, file.getId(), "Error: " + e.message);
+                            Logger.log(`Error renaming ${currentName}: ${e.message}`);
+                        }
+                    } else {
+                        Logger.log(`Skipping ${currentName} (Already matches new name)`);
+                    }
+                    
+                    // Stop checking other rules for this file once a match is found
+                    break; 
+                }
+            }
+        }
+    } catch (e) {
+        Logger.log(`Error accessing folder ${folderId}: ${e.message}`);
+    }
+}

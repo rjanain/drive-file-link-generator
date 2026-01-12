@@ -12,9 +12,22 @@ function ensureSheet(spreadsheet, sheetName, headers) {
         sheet = spreadsheet.insertSheet(sheetName);
         sheet.appendRow(headers);
     } else {
-        if (sheet.getLastRow() === 0) {
+        const lastRow = sheet.getLastRow();
+        if (lastRow === 0) {
             Logger.log(`Sheet ${sheetName} is empty. Appending headers.`);
             sheet.appendRow(headers);
+        } else {
+            // Check if first row matches headers or is empty
+            const firstRowRange = sheet.getRange(1, 1, 1, headers.length);
+            const firstRowValues = firstRowRange.getValues()[0];
+            
+            // Check if the header row is completely empty
+            const isHeaderEmpty = firstRowValues.every(cell => cell === "");
+            
+            if (isHeaderEmpty) {
+                Logger.log(`Sheet ${sheetName} has existing rows but missing headers. Setting headers.`);
+                firstRowRange.setValues([headers]);
+            }
         }
     }
 }
@@ -71,5 +84,46 @@ function logFilesToSheet(files, folderName) {
         sheet.getRange(lastRow + 1, 1, values.length, values[0].length).setValues(values);
     }
     return files.length;
+}
+
+/**
+ * Retrieves renaming rules from the RenamingRules sheet.
+ * @param {GoogleAppsScript.Spreadsheet.Spreadsheet} spreadsheet - Spreadsheet object.
+ * @return {Array} An array of objects containing { searchId, newName }.
+ */
+function getRenamingRules(spreadsheet) {
+    const sheet = spreadsheet.getSheetByName(config.sheetNames.renamingRules);
+    if (!sheet) {
+        Logger.log("Renaming rules sheet not found.");
+        return [];
+    }
+    const data = sheet.getDataRange().getValues();
+    const rules = [];
+    // Assuming headers are in row 1, iterate from row 2
+    for (let i = 1; i < data.length; i++) {
+        const row = data[i];
+        if (row[0] && row[1]) {
+            rules.push({ searchId: String(row[0]), newName: String(row[1]) });
+        }
+    }
+    Logger.log(`Retrieved ${rules.length} renaming rules.`);
+    return rules;
+}
+
+/**
+ * Logs a renaming action to the RenamingLog sheet.
+ * @param {GoogleAppsScript.Spreadsheet.Spreadsheet} spreadsheet - Spreadsheet object.
+ * @param {string} originalName - Original file name.
+ * @param {string} newName - New file name.
+ * @param {string} fileId - ID of the file.
+ * @param {string} status - Status of the operation.
+ */
+function logRenamingResult(spreadsheet, originalName, newName, fileId, status) {
+    let sheet = spreadsheet.getSheetByName(config.sheetNames.renamingLog);
+    if (!sheet) {
+         ensureSheet(spreadsheet, config.sheetNames.renamingLog, config.headers.renamingLog);
+         sheet = spreadsheet.getSheetByName(config.sheetNames.renamingLog);
+    }
+    sheet.appendRow([originalName, newName, fileId, status, new Date()]);
 }
 

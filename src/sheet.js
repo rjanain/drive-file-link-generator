@@ -120,10 +120,17 @@ function getRenamingRules(spreadsheet) {
  */
 function logRenamingResult(spreadsheet, originalName, newName, fileId, status) {
     let sheet = spreadsheet.getSheetByName(config.sheetNames.renamingLog);
+    
     if (!sheet) {
          ensureSheet(spreadsheet, config.sheetNames.renamingLog, config.headers.renamingLog);
          sheet = spreadsheet.getSheetByName(config.sheetNames.renamingLog);
+    } 
+    
+    // Ensure that if the sheet exists but is empty, we add headers before logging data
+    if (sheet.getLastRow() === 0) {
+        sheet.appendRow(config.headers.renamingLog);
     }
+    
     sheet.appendRow([originalName, newName, fileId, status, new Date()]);
 }
 

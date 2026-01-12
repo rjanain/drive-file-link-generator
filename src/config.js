@@ -3,10 +3,10 @@ const RENAMING_FOLDER_ID = "RENAME_FOLDER_ID"; // Replace Your Google Drive ID (
 const STORAGE_SHEET_ID = "STORAGE_SHEET_ID"; // Replace Your Google Sheet ID
 
 /* Sheet Names */
-const DATA_TRACK_SHEET_NAME = "DriveFile";
-const LINKS_SHEET_NAME = "AnswerScriptLink";
-const RENAMING_RULES_SHEET_NAME = "RenamingRules";
-const RENAMING_LOG_SHEET_NAME = "RenamingLog";
+const DATA_TRACK_SHEET_NAME = "DriveFile"; //Replace Your Data Tracking Sheet Name
+const LINKS_SHEET_NAME = "AnswerScriptLink"; //Replace Your Links Sheet Name
+const RENAMING_RULES_SHEET_NAME = "RenamingRules"; //Replace Your Renaming Rules Sheet Name
+const RENAMING_LOG_SHEET_NAME = "RenamingLog"; //Replace Your Renaming Log Sheet Name
 
 /**
  * Configuration object for the script.

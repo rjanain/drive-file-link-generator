@@ -20,10 +20,10 @@ function ensureSheet(spreadsheet, sheetName, headers) {
             // Check if first row matches headers or is empty
             const firstRowRange = sheet.getRange(1, 1, 1, headers.length);
             const firstRowValues = firstRowRange.getValues()[0];
-            
+
             // Check if the header row is completely empty
             const isHeaderEmpty = firstRowValues.every(cell => cell === "");
-            
+
             if (isHeaderEmpty) {
                 Logger.log(`Sheet ${sheetName} has existing rows but missing headers. Setting headers.`);
                 firstRowRange.setValues([headers]);
@@ -120,17 +120,17 @@ function getRenamingRules(spreadsheet) {
  */
 function logRenamingResult(spreadsheet, originalName, newName, fileId, status) {
     let sheet = spreadsheet.getSheetByName(config.sheetNames.renamingLog);
-    
+
     if (!sheet) {
-         ensureSheet(spreadsheet, config.sheetNames.renamingLog, config.headers.renamingLog);
-         sheet = spreadsheet.getSheetByName(config.sheetNames.renamingLog);
-    } 
-    
+        ensureSheet(spreadsheet, config.sheetNames.renamingLog, config.headers.renamingLog);
+        sheet = spreadsheet.getSheetByName(config.sheetNames.renamingLog);
+    }
+
     // Ensure that if the sheet exists but is empty, we add headers before logging data
     if (sheet.getLastRow() === 0) {
         sheet.appendRow(config.headers.renamingLog);
     }
-    
+
     sheet.appendRow([originalName, newName, fileId, status, new Date()]);
 }
 

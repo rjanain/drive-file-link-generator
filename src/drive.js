@@ -54,7 +54,7 @@ function listSubFolders(folderId, existingFolders) {
  */
 function renameFilesBasedOnRules(folderId, rules, spreadsheet) {
     Logger.log(`Starting renaming process in folder: ${folderId}`);
-    
+
     let stats = {
         filesCount: 0,
         renameCount: 0
@@ -63,7 +63,7 @@ function renameFilesBasedOnRules(folderId, rules, spreadsheet) {
     try {
         const rootFolder = DriveApp.getFolderById(folderId);
         processFolderRecursively(rootFolder, rules, spreadsheet, stats);
-        
+
         Logger.log(`Finished processing folder tree. Total files scanned: ${stats.filesCount}. Total files renamed: ${stats.renameCount}.`);
 
     } catch (e) {
@@ -82,26 +82,26 @@ function processFolderRecursively(folder, rules, spreadsheet, stats) {
     try {
         // Process files in the current folder
         const files = folder.getFiles();
-        
+
         while (files.hasNext()) {
             const file = files.next();
             stats.filesCount++;
             const currentName = file.getName();
-            
+
             // Filter by file type if configured
             if (config.targetFileType && !currentName.toLowerCase().endsWith(`.${config.targetFileType.toLowerCase()}`)) {
                 continue;
             }
-            
+
             for (const rule of rules) {
                 if (currentName.includes(rule.searchId)) {
-                    
+
                     const extensionMatch = currentName.match(/\.[^/.]+$/);
                     const extension = extensionMatch ? extensionMatch[0] : "";
-                    
+
                     const newNameBase = rule.newName;
                     const finalNewName = newNameBase.endsWith(extension) ? newNameBase : newNameBase + extension;
-                    
+
                     if (currentName !== finalNewName) {
                         try {
                             file.setName(finalNewName);
@@ -115,7 +115,7 @@ function processFolderRecursively(folder, rules, spreadsheet, stats) {
                     } else {
                         Logger.log(`Skipping ${currentName} (Already matches new name)`);
                     }
-                    break; 
+                    break;
                 }
             }
         }

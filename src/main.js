@@ -74,7 +74,7 @@ function revertLastRenamingBatch() {
 
   // NOTE: Removed UI confirmation for standalone execution. 
   // Be careful when running this function!
-  
+
   const data = sheet.getDataRange().getValues();
   // Headers: Original Name, New Name, File ID, Status, Date
 
